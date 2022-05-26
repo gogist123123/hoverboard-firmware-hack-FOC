@@ -1065,12 +1065,12 @@ void readCommand(void) {
     handleTimeout();
 
     #ifdef VARIANT_HOVERCAR
-    if (inIdx == CONTROL_ADC) {
-      brakePressed = (uint8_t)(input1[inIdx].cmd > 50);
-    }
-    else {
-      brakePressed = (uint8_t)(input2[inIdx].cmd < -50);
-    }
+      if (inIdx == CONTROL_ADC) {
+        brakePressed = (uint8_t)(input1[inIdx].cmd > 50);
+      }
+      else {
+        brakePressed = (uint8_t)(input2[inIdx].cmd < -50);
+      }
     #endif
 
     #if defined(SUPPORT_BUTTONS_LEFT) || defined(SUPPORT_BUTTONS_RIGHT)
@@ -1185,21 +1185,21 @@ void usart3_rx_check(void)
   #endif // DEBUG_SERIAL_USART3
 
   #ifdef CONTROL_SERIAL_USART3
-  uint8_t *ptr;
-  if (pos != old_pos) {                                                 // Check change in received data
-    ptr = (uint8_t *)&commandR_raw;                                     // Initialize the pointer with command_raw address
-    if (pos > old_pos && (pos - old_pos) == commandR_len) {             // "Linear" buffer mode: check if current position is over previous one AND data length equals expected length
-      memcpy(ptr, &rx_buffer_R[old_pos], commandR_len);                 // Copy data. This is possible only if command_raw is contiguous! (meaning all the structure members have the same size)
-      usart_process_command(&commandR_raw, &commandR, 3);               // Process data
-    } else if ((rx_buffer_R_len - old_pos + pos) == commandR_len) {     // "Overflow" buffer mode: check if data length equals expected length
-      memcpy(ptr, &rx_buffer_R[old_pos], rx_buffer_R_len - old_pos);    // First copy data from the end of buffer
-      if (pos > 0) {                                                    // Check and continue with beginning of buffer
-        ptr += rx_buffer_R_len - old_pos;                               // Move to correct position in command_raw
-        memcpy(ptr, &rx_buffer_R[0], pos);                              // Copy remaining data
+    uint8_t *ptr;
+    if (pos != old_pos) {                                                 // Check change in received data
+      ptr = (uint8_t *)&commandR_raw;                                     // Initialize the pointer with command_raw address
+      if (pos > old_pos && (pos - old_pos) == commandR_len) {             // "Linear" buffer mode: check if current position is over previous one AND data length equals expected length
+        memcpy(ptr, &rx_buffer_R[old_pos], commandR_len);                 // Copy data. This is possible only if command_raw is contiguous! (meaning all the structure members have the same size)
+        usart_process_command(&commandR_raw, &commandR, 3);               // Process data
+      } else if ((rx_buffer_R_len - old_pos + pos) == commandR_len) {     // "Overflow" buffer mode: check if data length equals expected length
+        memcpy(ptr, &rx_buffer_R[old_pos], rx_buffer_R_len - old_pos);    // First copy data from the end of buffer
+        if (pos > 0) {                                                    // Check and continue with beginning of buffer
+          ptr += rx_buffer_R_len - old_pos;                               // Move to correct position in command_raw
+          memcpy(ptr, &rx_buffer_R[0], pos);                              // Copy remaining data
+        }
+        usart_process_command(&commandR_raw, &commandR, 3);               // Process data
       }
-      usart_process_command(&commandR_raw, &commandR, 3);               // Process data
     }
-  }
   #endif // CONTROL_SERIAL_USART3
 
   #ifdef SIDEBOARD_SERIAL_USART3
