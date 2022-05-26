@@ -42,13 +42,26 @@ uint16_t bufStartFrame;                 // Buffer Start Frame
 byte *p;                                // Pointer declaration for the new received data
 byte incomingByte;
 byte incomingBytePrev;
-
-typedef struct{
-   uint16_t start;
-   int16_t  steer;
-   int16_t  speed;
-   uint16_t checksum;
-} SerialCommand;
+#ifdef CONTROL_SERIAL_KCQ
+  typedef struct{
+    uint8_t start;
+    uint8_t thrust_msb;
+    uint8_t thrust_lsb;
+    uint8_t brake_msb;
+    uint8_t brake_lsb;
+    uint8_t flags1;
+    uint8_t flags2;
+    uint8_t checksum;
+    uint8_t footer;
+  } SerialCommand;
+#else
+  typedef struct{
+    uint16_t start;
+    int16_t  steer;
+    int16_t  speed;
+    uint16_t checksum;
+  } SerialCommand;
+#endif
 SerialCommand Command;
 
 typedef struct{

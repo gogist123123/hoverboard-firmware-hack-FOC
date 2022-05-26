@@ -1270,25 +1270,45 @@ void usart_process_command(SerialCommand *command_in, SerialCommand *command_out
         }
       }
     }
-  #else
-  uint16_t checksum;
-  if (command_in->start == SERIAL_START_FRAME) {
-    checksum = (uint16_t)(command_in->start ^ command_in->steer ^ command_in->speed);
-    if (command_in->checksum == checksum) {
-      *command_out = *command_in;
-      if (usart_idx == 2) {             // Sideboard USART2
-        #ifdef CONTROL_SERIAL_USART2
-        timeoutFlgSerial_L = 0;         // Clear timeout flag
-        timeoutCntSerial_L = 0;         // Reset timeout counter
-        #endif
-      } else if (usart_idx == 3) {      // Sideboard USART3
-        #ifdef CONTROL_SERIAL_USART3
-        timeoutFlgSerial_R = 0;         // Clear timeout flag
-        timeoutCntSerial_R = 0;         // Reset timeout counter
-        #endif
+  #elif defined CONTROL_SERIAL_KCQ
+    uint8_t checksum;
+    if (command_in->start == SERIAL_START_FRAME)
+    {
+      checksum = (uint8_t)(command_in->thrust_msb^command_in->thrust_lsb^command_in->brake_msb^command_in->brake_lsb^command_in->flags1^command_in->flags2);
+      if (command_in->checksum == checksum) {
+        *command_out = *command_in;
+        if (usart_idx == 2) {             // Sideboard USART2
+          #ifdef CONTROL_SERIAL_USART2
+          timeoutFlgSerial_L = 0;         // Clear timeout flag
+          timeoutCntSerial_L = 0;         // Reset timeout counter
+          #endif
+        } else if (usart_idx == 3) {      // Sideboard USART3
+          #ifdef CONTROL_SERIAL_USART3
+          timeoutFlgSerial_R = 0;         // Clear timeout flag
+          timeoutCntSerial_R = 0;         // Reset timeout counter
+          #endif
+        }
       }
     }
-  }
+  #else
+    uint16_t checksum;
+    if (command_in->start == SERIAL_START_FRAME) {
+      checksum = (uint16_t)(command_in->start ^ command_in->steer ^ command_in->speed);
+      if (command_in->checksum == checksum) {
+        *command_out = *command_in;
+        if (usart_idx == 2) {             // Sideboard USART2
+          #ifdef CONTROL_SERIAL_USART2
+          timeoutFlgSerial_L = 0;         // Clear timeout flag
+          timeoutCntSerial_L = 0;         // Reset timeout counter
+          #endif
+        } else if (usart_idx == 3) {      // Sideboard USART3
+          #ifdef CONTROL_SERIAL_USART3
+          timeoutFlgSerial_R = 0;         // Clear timeout flag
+          timeoutCntSerial_R = 0;         // Reset timeout counter
+          #endif
+        }
+      }
+    }
   #endif
 }
 #endif
