@@ -875,6 +875,10 @@ void readInputRaw(void) {
         }
         input1[inIdx].raw = (ibusR_captured_value[0] - 500) * 2;
         input2[inIdx].raw = (ibusR_captured_value[1] - 500) * 2; 
+      #elif defined CONTROL_SERIAL_KCQ
+      input1[inIdx].raw = (commandR.thrust_msb << 8) | commandR.thrust_lsb;
+      input2[inIdx].raw = (commandR.brake_msb << 8) | commandR.brake_lsb;
+      //todo: this^)
       #else
         input1[inIdx].raw = commandR.steer;
         input2[inIdx].raw = commandR.speed;
