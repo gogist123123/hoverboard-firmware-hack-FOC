@@ -34,6 +34,18 @@
       uint8_t  checksuml;
       uint8_t  checksumh;
     } SerialCommand;
+  #else if defined CONTROL_SERIAL_KCQ
+    typedef struct{
+    uint8_t start;
+    uint8_t thrust_msb;
+    uint8_t thrust_lsb;
+    uint8_t brake_msb;
+    uint8_t brake_lsb;
+    uint8_t flags1;
+    uint8_t flags2;
+    uint8_t checksum;
+    uint8_t footer;
+    } SerialCommand;
   #else
     typedef struct{
       uint16_t  start;
@@ -43,6 +55,7 @@
     } SerialCommand;
   #endif
 #endif
+
 #if defined(SIDEBOARD_SERIAL_USART2) || defined(SIDEBOARD_SERIAL_USART3)
     typedef struct{
       uint16_t  start;
@@ -67,26 +80,7 @@ typedef struct {
   int16_t   dband;  // deadband
 } InputStruct;
 
-#ifdef CONTROL_SERIAL_KCQ
-  typedef struct{
-    uint8_t start;
-    uint8_t thrust_msb;
-    uint8_t thrust_lsb;
-    uint8_t brake_msb;
-    uint8_t brake_lsb;
-    uint8_t flags1;
-    uint8_t flags2;
-    uint8_t checksum;
-    uint8_t footer;
-  } SerialCommand;
-#else
-  typedef struct{
-    uint16_t start;
-    int16_t  steer;
-    int16_t  speed;
-    uint16_t checksum;
-  } SerialCommand;
-#endif
+
 
 // Initialization Functions
 void BLDC_Init(void);
