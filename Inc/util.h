@@ -34,7 +34,7 @@
       uint8_t  checksuml;
       uint8_t  checksumh;
     } SerialCommand;
-  #else if defined CONTROL_SERIAL_KCQ
+  #elif defined CONTROL_SERIAL_KCQ
     typedef struct{
     uint8_t start;
     uint8_t thrust_msb;
