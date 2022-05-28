@@ -117,19 +117,39 @@ int16_t cmdR;                    // global variable for Right Command
 // Local variables
 //------------------------------------------------------------------------
 #if defined(FEEDBACK_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART3)
-typedef struct{
-  uint16_t  start;
-  int16_t   cmd1;
-  int16_t   cmd2;
-  int16_t   speedR_meas;
-  int16_t   speedL_meas;
-  int16_t   batVoltage;
-  int16_t   boardTemp;
-  uint16_t  cmdLed;
-  uint16_t  checksum;
-} SerialFeedback;
+#ifdef CONTROL_SERIAL_KCQ
+  typedef struct{
+    uint8_t  start; //always 5a, header
+    uint8_t  speed_lsb; // lsb of (speed / (10km/h))
+    uint8_t  speed_msb; // msb of (speed / (10km/h))
+    uint8_t  mileage_lsb; // lsb of (mielage/100m)
+    uint8_t  mileage_msb; // msb of (mielage/100m)
+    uint8_t  charge; //charge in %
+    uint8_t  faults; //fault flags
+    uint8_t  flags1;
+    uint8_t  flags2;
+    uint8_t  time_lsb; //lsb of riding time seconds
+    uint8_t  time_msb; //msb of riding time seconds
+    uint8_t  checksum; //CheckSum8 Xor of [byte1] to [byte10]
+    uint8_t  footer; //always b5, footer
+  } SerialFeedback;
+#else
+  typedef struct{
+    uint16_t  start;
+    int16_t   cmd1;
+    int16_t   cmd2;
+    int16_t   speedR_meas;
+    int16_t   speedL_meas;
+    int16_t   batVoltage;
+    int16_t   boardTemp;
+    uint16_t  cmdLed;
+    uint16_t  checksum;
+  } SerialFeedback;
+#endif
 static SerialFeedback Feedback;
 #endif
+
+
 #if defined(FEEDBACK_SERIAL_USART2)
 static uint8_t sideboard_leds_L;
 #endif
@@ -463,28 +483,55 @@ int main(void) {
     // ####### FEEDBACK SERIAL OUT #######
     #if defined(FEEDBACK_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART3)
       if (main_loop_counter % 2 == 0) {    // Send data periodically every 10 ms
-        Feedback.start	        = (uint16_t)SERIAL_START_FRAME;
-        Feedback.cmd1           = (int16_t)input1[inIdx].cmd;
-        Feedback.cmd2           = (int16_t)input2[inIdx].cmd;
-        Feedback.speedR_meas	  = (int16_t)rtY_Right.n_mot;
-        Feedback.speedL_meas	  = (int16_t)rtY_Left.n_mot;
-        Feedback.batVoltage	    = (int16_t)batVoltageCalib;
-        Feedback.boardTemp	    = (int16_t)board_temp_deg_c;
+        #ifdef CONTROL_SERIAL_KCQ
+        
+          Feedback.start = 0x5a; //always 5a, header
+          Feedback.speed_lsb = 0x00; // lsb of (speed / (10km/h))
+          Feedback.speed_msb = 0x00; // msb of (speed / (10km/h))
+          Feedback.mileage_lsb = 0x00; // lsb of (mielage/100m)
+          Feedback.mileage_msb = 0x00; // msb of (mielage/100m)
+          Feedback.charge = 50; //charge in %
+          Feedback.faults = 0x00; //fault flags
+          Feedback.flags1 = 0x20;
+          Feedback.flags2 = 0x00;
+          Feedback.time_lsb = 0x00; //lsb of riding time seconds
+          Feedback.time_msb = 0x00; //msb of riding time seconds
+          Feedback.checksum; //CheckSum8 Xor of [byte1] to [byte10]
+          Feedback.footer; //always b5, footer
+          Feedback.checksum   = (uint16_t)(Feedback.speed_lsb ^ Feedback.speed_msb ^ Feedback.mileage_lsb ^ Feedback.mileage_msb 
+                                           ^ Feedback.charge ^ Feedback.faults ^ Feedback.flags1 ^ Feedback.flags2 ^ Feedback.time_lsb ^ Feedback.time_msb);
+
+
+        #else
+          Feedback.start	        = (uint16_t)SERIAL_START_FRAME;
+          Feedback.cmd1           = (int16_t)input1[inIdx].cmd;
+          Feedback.cmd2           = (int16_t)input2[inIdx].cmd;
+          Feedback.speedR_meas	  = (int16_t)rtY_Right.n_mot;
+          Feedback.speedL_meas	  = (int16_t)rtY_Left.n_mot;
+          Feedback.batVoltage	    = (int16_t)batVoltageCalib;
+          Feedback.boardTemp	    = (int16_t)board_temp_deg_c;
+          
+
+        #endif
 
         #if defined(FEEDBACK_SERIAL_USART2)
           if(__HAL_DMA_GET_COUNTER(huart2.hdmatx) == 0) {
+            #ifndef CONTROL_SERIAL_KCQ
             Feedback.cmdLed     = (uint16_t)sideboard_leds_L;
             Feedback.checksum   = (uint16_t)(Feedback.start ^ Feedback.cmd1 ^ Feedback.cmd2 ^ Feedback.speedR_meas ^ Feedback.speedL_meas 
                                            ^ Feedback.batVoltage ^ Feedback.boardTemp ^ Feedback.cmdLed);
+            #endif
 
             HAL_UART_Transmit_DMA(&huart2, (uint8_t *)&Feedback, sizeof(Feedback));
           }
         #endif
         #if defined(FEEDBACK_SERIAL_USART3)
           if(__HAL_DMA_GET_COUNTER(huart3.hdmatx) == 0) {
+            #ifndef CONTROL_SERIAL_KCQ
             Feedback.cmdLed     = (uint16_t)sideboard_leds_R;
             Feedback.checksum   = (uint16_t)(Feedback.start ^ Feedback.cmd1 ^ Feedback.cmd2 ^ Feedback.speedR_meas ^ Feedback.speedL_meas 
                                            ^ Feedback.batVoltage ^ Feedback.boardTemp ^ Feedback.cmdLed);
+            #endif
 
             HAL_UART_Transmit_DMA(&huart3, (uint8_t *)&Feedback, sizeof(Feedback));
           }
