@@ -497,7 +497,7 @@ int main(void) {
           Feedback.time_lsb = 0x00; //lsb of riding time seconds
           Feedback.time_msb = 0x00; //msb of riding time seconds
           Feedback.checksum; //CheckSum8 Xor of [byte1] to [byte10]
-          Feedback.footer; //always b5, footer
+          Feedback.footer = 0xb5; //always b5, footer
           Feedback.checksum   = (uint16_t)(Feedback.speed_lsb ^ Feedback.speed_msb ^ Feedback.mileage_lsb ^ Feedback.mileage_msb 
                                            ^ Feedback.charge ^ Feedback.faults ^ Feedback.flags1 ^ Feedback.flags2 ^ Feedback.time_lsb ^ Feedback.time_msb);
 
