@@ -493,7 +493,7 @@ int main(void) {
           Feedback.charge = 50; //charge in %
           Feedback.faults = 0x00; //fault flags
           Feedback.flags1 = 0x20;
-          Feedback.flags2 = 0x00;
+          Feedback.flags2 = 0x0b;
           Feedback.time_lsb = 0x00; //lsb of riding time seconds
           Feedback.time_msb = 0x00; //msb of riding time seconds
           Feedback.checksum; //CheckSum8 Xor of [byte1] to [byte10]
