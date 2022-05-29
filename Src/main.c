@@ -493,7 +493,7 @@ int main(void) {
             speed100m = 0; 
           #endif
           int16_t charge_percent ;
-          charge_percent = (int16_t)((batVoltageCalib - (BAT_EMPTY_CELL * BAT_CELLS)) / ((BAT_FULL_CELL * BAT_CELLS) - (BAT_EMPTY_CELL * BAT_CELLS))) * 100;   
+          charge_percent = (int16_t)(((batVoltageCalib - (BAT_EMPTY_CELL * BAT_CELLS))*100) / ((BAT_FULL_CELL * BAT_CELLS) - (BAT_EMPTY_CELL * BAT_CELLS)));   
           Feedback.start = 0x5a; //always 5a, header
           Feedback.speed_lsb = speed100m & 0x00ff; // lsb of (speed in km/h *10)
           Feedback.speed_msb = (speed100m & 0xff00) >> 8; // msb of (speed in km/h *10)
