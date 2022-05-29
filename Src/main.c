@@ -509,7 +509,7 @@ int main(void) {
           }
           else
           {
-            FeedBack.charge = (uint8_t)charge_percent;
+            Feedback.charge = (uint8_t)charge_percent;
           }  
           Feedback.faults = 0x00; //fault flags
           Feedback.flags1 = 0x20; // seems like dash ignore this byte
