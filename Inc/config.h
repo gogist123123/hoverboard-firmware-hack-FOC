@@ -89,6 +89,8 @@
 #define BAT_LVL2                (360 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE    // Red:          gently beep at this voltage level. [V*100/cell]. In this case 3.60 V/cell
 #define BAT_LVL1                (350 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE    // Red blink:    fast beep. Your battery is almost empty. Charge now! [V*100/cell]. In this case 3.50 V/cell
 #define BAT_DEAD                (337 * BAT_CELLS * BAT_CALIB_ADC) / BAT_CALIB_REAL_VOLTAGE    // All leds off: undervoltage poweroff. (while not driving) [V*100/cell]. In this case 3.37 V/cell
+#define BAT_EMPTY_CELL 337 // 0% cell voltage in 10mv units for charge in % calculation
+#define BAT_FULL_CELL 420 // 100% cell voltage in 10mv units for charge in % calculation
 // ######################## END OF BATTERY ###############################
 
 
@@ -369,6 +371,9 @@
   // #define DEBUG_SERIAL_USART3          // right sensor board cable, disable if I2C (nunchuk or lcd) is used!
    //#define DEBUG_SERIAL_PROTOCOL        // uncomment this to send user commands to the board, change parameters and print specific signals (see comms.c for the user commands)
 
+  #define SPEED_MEAS_LEFT // measure speed on the left wheel
+  //#define SPEED_MEAS_RIGHT // measure speed on the left wheel. do not use both left and right wheel measure.
+  #define SPEED_MEAS_CIRCUMFERENCE 660//circumference of selected wheel for speed calculation(in mm) 
 
   // #define TANK_STEERING              // use for tank steering, each input controls each wheel 
   // #define SUPPORT_BUTTONS_LEFT       // use left sensor board cable for button inputs.  Disable DEBUG_SERIAL_USART2!

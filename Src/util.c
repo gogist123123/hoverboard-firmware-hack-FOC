@@ -878,7 +878,7 @@ void readInputRaw(void) {
       #elif defined CONTROL_SERIAL_KCQ
       input1[inIdx].raw = (commandR.thrust_msb << 8) | commandR.thrust_lsb;
       input2[inIdx].raw = (commandR.brake_msb << 8) | commandR.brake_lsb;
-      //todo: this^)
+      //TODO: this^)
       #else
         input1[inIdx].raw = commandR.steer;
         input2[inIdx].raw = commandR.speed;

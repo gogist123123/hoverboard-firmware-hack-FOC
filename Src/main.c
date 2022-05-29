@@ -483,14 +483,29 @@ int main(void) {
     // ####### FEEDBACK SERIAL OUT #######
     #if defined(FEEDBACK_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART3)
       if (main_loop_counter % 2 == 0) {    // Send data periodically every 10 ms
-        #ifdef CONTROL_SERIAL_KCQ
-        
+        #ifdef CONTROL_SERIAL_KCQ        
+          uint16_t speed100m;
+          #ifdef SPEED_MEAS_LEFT
+            speed100m = (int16_t)((rtY_Left.n_mot * 60 * SPEED_MEAS_CIRCUMFERENCE) / 100000);
+          #elif defined SPEED_MEAS_RIGHT
+            speed100m = (int16_t)((rtY_Right.n_mot * 60 * SPEED_MEAS_CIRCUMFERENCE) / 100000);
+          #else
+            speed100m = 0; 
+          #endif
           Feedback.start = 0x5a; //always 5a, header
-          Feedback.speed_lsb = 0x00; // lsb of (speed / (10km/h))
-          Feedback.speed_msb = 0x00; // msb of (speed / (10km/h))
+          Feedback.speed_lsb = speed100m & 0x00ff; // lsb of (speed in km/h *10)
+          Feedback.speed_msb = (speed100m & 0xff00) >> 8; // msb of (speed in km/h *10)
           Feedback.mileage_lsb = 0x00; // lsb of (mielage/100m)
           Feedback.mileage_msb = 0x00; // msb of (mielage/100m)
-          Feedback.charge = 50; //charge in %
+          if(batVoltageCalib > (BAT_EMPTY_CELL * BAT_CELLS))
+          {
+            FeedBack.charge = (uint8_t)(batVoltageCalib - (BAT_EMPTY_CELL * BAT_CELLS))/((BAT_FULL_CELL * BAT_CELLS) - (BAT_EMPTY_CELL * BAT_CELLS)) * 100;
+          }
+          else
+          {
+            Feedback.charge = 0; //charge in %
+          }
+          
           Feedback.faults = 0x00; //fault flags
           Feedback.flags1 = 0x20;
           Feedback.flags2 = 0x0b;
