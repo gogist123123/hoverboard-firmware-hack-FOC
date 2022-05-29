@@ -355,8 +355,8 @@
    #define FEEDBACK_SERIAL_USART3      // right sensor board cable, disable if I2C (nunchuk or lcd) is used!
  
   // #define DUAL_INPUTS                 //  UART*(Primary) + SIDEBOARD(Auxiliary). Uncomment this to use Dual-inputs
-  #define PRI_INPUT1             1, 630, 0, 2600, 0     // TYPE, MIN, MID, MAX, DEADBAND. See INPUT FORMAT section
-  #define PRI_INPUT2             1, 670, 0, 2800, 0     // TYPE, MIN, MID, MAX, DEADBAND. See INPUT FORMAT section
+  #define PRI_INPUT1             1, 650, 0, 2600, 30     // TYPE, MIN, MID, MAX, DEADBAND. See INPUT FORMAT section
+  #define PRI_INPUT2             1, 690, 0, 2800, 30    // TYPE, MIN, MID, MAX, DEADBAND. See INPUT FORMAT section
   #ifdef DUAL_INPUTS
     #define FLASH_WRITE_KEY      0x1102  // Flash memory writing key. Change this key to ignore the input calibrations from the flash memory and use the ones in config.h
     // #define SIDEBOARD_SERIAL_USART2 1   // left sideboard
