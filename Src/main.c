@@ -492,30 +492,33 @@ int main(void) {
           #else
             speed100m = 0; 
           #endif
+          int16_t charge_percent ;
+          charge_percent = (int16_t)(batVoltageCalib - (BAT_EMPTY_CELL * BAT_CELLS))/((BAT_FULL_CELL * BAT_CELLS) - (BAT_EMPTY_CELL * BAT_CELLS)) * 100;   
           Feedback.start = 0x5a; //always 5a, header
           Feedback.speed_lsb = speed100m & 0x00ff; // lsb of (speed in km/h *10)
           Feedback.speed_msb = (speed100m & 0xff00) >> 8; // msb of (speed in km/h *10)
           Feedback.mileage_lsb = 0x00; // lsb of (mielage/100m)
           Feedback.mileage_msb = 0x00; // msb of (mielage/100m)
-          if(batVoltageCalib > (BAT_EMPTY_CELL * BAT_CELLS))
+          if(charge_percent < 0)//charge in %
           {
-            FeedBack.charge = (uint8_t)(batVoltageCalib - (BAT_EMPTY_CELL * BAT_CELLS))/((BAT_FULL_CELL * BAT_CELLS) - (BAT_EMPTY_CELL * BAT_CELLS)) * 100;
+            FeedBack.charge = 0;
+          }
+          else if(charge_percent > 100)
+          {
+            Feedback.charge = 100; 
           }
           else
           {
-            Feedback.charge = 0; //charge in %
-          }
-          
+            FeedBack.charge = (uint8_t)charge_percent;
+          }  
           Feedback.faults = 0x00; //fault flags
-          Feedback.flags1 = 0x20;
-          Feedback.flags2 = 0x0b;
+          Feedback.flags1 = 0x20; // seems like dash ignore this byte
+          Feedback.flags2 = 0x0b; // seems like dash ignore this byte
           Feedback.time_lsb = 0x00; //lsb of riding time seconds
           Feedback.time_msb = 0x00; //msb of riding time seconds
-          Feedback.checksum; //CheckSum8 Xor of [byte1] to [byte10]
-          Feedback.footer = 0xb5; //always b5, footer
           Feedback.checksum   = (uint16_t)(Feedback.speed_lsb ^ Feedback.speed_msb ^ Feedback.mileage_lsb ^ Feedback.mileage_msb 
                                            ^ Feedback.charge ^ Feedback.faults ^ Feedback.flags1 ^ Feedback.flags2 ^ Feedback.time_lsb ^ Feedback.time_msb);
-
+          Feedback.footer = 0xb5; //always b5, footer
 
         #else
           Feedback.start	        = (uint16_t)SERIAL_START_FRAME;
