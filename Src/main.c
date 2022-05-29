@@ -501,7 +501,7 @@ int main(void) {
           Feedback.mileage_msb = 0x00; // msb of (mielage/100m)
           if(charge_percent < 0)//charge in %
           {
-            FeedBack.charge = 0;
+            Feedback.charge = 0;
           }
           else if(charge_percent > 100)
           {
