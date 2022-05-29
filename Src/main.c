@@ -486,14 +486,14 @@ int main(void) {
         #ifdef CONTROL_SERIAL_KCQ        
           uint16_t speed100m;
           #ifdef SPEED_MEAS_LEFT
-            speed100m = (int16_t)((rtY_Left.n_mot * 60 * SPEED_MEAS_CIRCUMFERENCE) / 100000);
+            speed100m = (uint16_t)abs((rtY_Left.n_mot * 60 * SPEED_MEAS_CIRCUMFERENCE) / 100000);
           #elif defined SPEED_MEAS_RIGHT
-            speed100m = (int16_t)((rtY_Right.n_mot * 60 * SPEED_MEAS_CIRCUMFERENCE) / 100000);
+            speed100m = (uint16_t)abs((rtY_Right.n_mot * 60 * SPEED_MEAS_CIRCUMFERENCE) / 100000);
           #else
             speed100m = 0; 
           #endif
           int16_t charge_percent ;
-          charge_percent = (int16_t)(batVoltageCalib - (BAT_EMPTY_CELL * BAT_CELLS))/((BAT_FULL_CELL * BAT_CELLS) - (BAT_EMPTY_CELL * BAT_CELLS)) * 100;   
+          charge_percent = (int16_t)((batVoltageCalib - (BAT_EMPTY_CELL * BAT_CELLS)) / ((BAT_FULL_CELL * BAT_CELLS) - (BAT_EMPTY_CELL * BAT_CELLS))) * 100;   
           Feedback.start = 0x5a; //always 5a, header
           Feedback.speed_lsb = speed100m & 0x00ff; // lsb of (speed in km/h *10)
           Feedback.speed_msb = (speed100m & 0xff00) >> 8; // msb of (speed in km/h *10)
