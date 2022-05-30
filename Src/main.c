@@ -70,6 +70,8 @@ extern uint8_t     inIdx_prev;
 extern InputStruct input1[];            // input structure
 extern InputStruct input2[];            // input structure
 
+extern uint8_t kcq_rx_flags[];
+
 extern int16_t speedAvg;                // Average measured speed
 extern int16_t speedAvgAbs;             // Average measured speed in absolute
 extern volatile uint32_t timeoutCntGen; // Timeout counter for the General timeout (PPM, PWM, Nunchuk)
@@ -180,6 +182,7 @@ static int16_t    speed;                // local variable for speed. -1000 to 10
 
 static uint32_t    buzzerTimer_prev = 0;
 static uint32_t    inactivity_timeout_counter;
+static uint32_t    brakelight_counter;
 static MultipleTap MultipleTapBrake;    // define multiple tap functionality for the Brake pedal
 
 int main(void) {
@@ -221,8 +224,12 @@ int main(void) {
 #ifdef POWER_ON_PLAY_MELODY
   poweronMelody();
 #endif
+#ifndef KCQ_PCB_LED_BRAKE
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);
-  
+#endif
+
+
+
   int32_t board_temp_adcFixdt = adc_buffer.temp << 16;  // Fixed-point filter output initialized with current ADC converted to fixed-point
   int16_t board_temp_adcFilt  = adc_buffer.temp;
 
@@ -619,6 +626,34 @@ int main(void) {
       beepCount(0, 0, 0);
       backwardDrive = 0;
     }
+
+    #ifdef KCQ_PCB_LED_BRAKE
+    if((kcq_rx_flags[1] & FLAGS2_BRAKE) != 0) // if brake light bit is set
+    {
+      brakelight_counter++;
+      if (brakelight_counter > (KCQ_PRAKE_PERIOD) / (DELAY_IN_MAIN_LOOP + 1))
+      {
+        HAL_GPIO_TogglePin(LED_PORT, LED_PIN); //toggle led pin every KCQ_PRAKE_PERIOD ms
+        brakelight_counter = 0;//reset counter
+      }
+    }
+    else
+    {
+      brakelight_counter = (KCQ_PRAKE_PERIOD) / (DELAY_IN_MAIN_LOOP + 1);//for momentary toggling led after brace pressed
+      if((kcq_rx_flags[0] & FLAGS1_HEADLIGHT) || (kcq_rx_flags[0] & FLAGS1_TAILLIGHT)) // if any light is activated
+      {
+        HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_SET);//led on
+      }
+      else
+      {
+        HAL_GPIO_WritePin(LED_PORT, LED_PIN, GPIO_PIN_RESET);//led off
+      }
+
+    }
+
+
+
+    #endif
 
 
     inactivity_timeout_counter++;

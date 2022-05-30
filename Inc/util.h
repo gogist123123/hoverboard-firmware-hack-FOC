@@ -46,6 +46,17 @@
     uint8_t checksum;
     uint8_t footer;
     } SerialCommand;
+    #define FLAGS1_MODE_SD 0x01 //=1 in "s" and "d" mode, =0 in "eco" mode
+    #define FLAGS1_FSC 0x02 //=1 if fixed speed cruise on via bluetooth, =0 if off
+    #define FLAGS1_ZERO_START 0x04 //=0 if "non-zero start" mode selected via bluetooth, =1 if "zero start"
+    #define FLAGS1_HEADLIGHT 0x08 //=1 if front light on, =0 if off
+    #define FLAGS1_TAILLIGHT 0x10 //=1 if tail light on via bluetooth, =0 if off
+    #define FLAGS1_SPEED_MPH 0x20 //=0 if speed in km/h, =1 if mph (but bldc controller send speed always in km/h)
+    #define FLAGS1_LOCK 0x40 //=1 if lock(alarm?) on via bluetooth, =0 if off
+    #define FLAGS1_POWEROFF 0x80 //sets after holding the button for ~2 seconds(power off cmd). also sets if power off cmd sent via bluetooth
+
+    #define FLAGS2_BRAKE 0x01 //=1 if brake active(brakelight?)
+    #define FLAGS2_MODE_S //=0 in "eco" and "d" mode, =1 in "s" mode
   #else
     typedef struct{
       uint16_t  start;

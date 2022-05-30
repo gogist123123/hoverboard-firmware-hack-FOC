@@ -99,6 +99,10 @@ InputStruct input1[INPUTS_NR] = { {0, 0, 0, PRI_INPUT1} };
 InputStruct input2[INPUTS_NR] = { {0, 0, 0, PRI_INPUT2} };
 #endif
 
+#ifdef CONTROL_SERIAL_KCQ
+uint8_t kcq_rx_flags[2] = {0,0} ;
+#endif
+
 int16_t  speedAvg;                      // average measured speed
 int16_t  speedAvgAbs;                   // average measured speed in absolute
 uint8_t  timeoutFlgADC    = 0;          // Timeout Flag for ADC Protection:    0 = OK, 1 = Problem detected (line disconnected or wrong ADC data)
@@ -878,6 +882,8 @@ void readInputRaw(void) {
       #elif defined CONTROL_SERIAL_KCQ
       input2[inIdx].raw = (int16_t)((commandR.thrust_msb << 8) | commandR.thrust_lsb);
       input1[inIdx].raw = (int16_t)((commandR.brake_msb << 8) | commandR.brake_lsb);
+      kcq_rx_flags[0] = commandR.flags1;
+      kcq_rx_flags[1] = commandR.flags2;
       //TODO: this^)
       #else
         input1[inIdx].raw = commandR.steer;
@@ -1633,7 +1639,7 @@ void poweroffPressCheck(void) {
       }
     }
   #elif defined (VARIANT_KCQ_DASH)
-    if((commandR.flags1 & 0x80) != 0)// If power off flag is get from dash
+    if((kcq_rx_flags[0] & FLAGS1_POWEROFF) != 0)// If power off flag is get from dash
     {
       poweroff();
     }

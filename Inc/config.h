@@ -344,8 +344,11 @@
 // ######################## END OF VARIANT_USART SETTINGS #########################
 
 // ############################ VARIANT_KCQ_DASH SETTINGS ############################
-#ifdef VARIANT_KCQ_DASH
-#define CONTROL_SERIAL_KCQ
+  #ifdef VARIANT_KCQ_DASH
+  #define CONTROL_SERIAL_KCQ
+
+  #define KCQ_PCB_LED_BRAKE // use led fitted on pcb as brake/tail light.
+  #define KCQ_PRAKE_PERIOD 100 // half of period of brake light flashing (toggling period) in ms
 
   //Only usart 3 can de used for control in this variant(usart 2 is not 5v-tolerant). both tx and rx lines are open drain and must be pulled up to 5v.
    #define CONTROL_SERIAL_USART3  0    // right sensor board cable. Number indicates priority for dual-input. Disable if I2C (nunchuk or lcd) is used! For Arduino control check the hoverSerial.ino
