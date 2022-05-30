@@ -1580,7 +1580,7 @@ void poweroff(void) {
 
 
 void poweroffPressCheck(void) {
-  #if !defined(VARIANT_HOVERBOARD) && !defined(VARIANT_TRANSPOTTER)
+  #if !defined(VARIANT_HOVERBOARD) && !defined(VARIANT_TRANSPOTTER) && !defined(VARIANT_KCQ_DASH)
     if(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
       uint16_t cnt_press = 0;
       while(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
@@ -1632,6 +1632,12 @@ void poweroffPressCheck(void) {
         saveValue_valid = 1;
       }
     }
+  #elif defined (VARIANT_KCQ_DASH)
+    if((commandR.flags1 & 0x80) != 0)// If power off flag is get from dash
+    {
+      poweroff();
+    }
+
   #else
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
       enable = 0;                                             // disable motors

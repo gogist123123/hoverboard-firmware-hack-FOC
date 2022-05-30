@@ -182,7 +182,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     */
     GPIO_InitStruct.Pin = GPIO_PIN_10;
     #ifdef CONTROL_SERIAL_KCQ
-      GPIO_InitStruct.Mode = GPIO_Mode_AF_OD;
+      GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     #else
       GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     #endif
