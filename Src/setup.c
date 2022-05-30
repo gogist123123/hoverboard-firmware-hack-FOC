@@ -181,7 +181,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     PB11     ------> USART3_RX 
     */
     GPIO_InitStruct.Pin = GPIO_PIN_10;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    #ifdef CONTROL_SERIAL_KCQ
+      GPIO_InitStruct.Mode = GPIO_Mode_AF_OD;
+    #else
+      GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    #endif
+    
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
