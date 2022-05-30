@@ -249,13 +249,21 @@ int main(void) {
       }
 
       // ####### VARIANT_HOVERCAR #######
-      #if defined(VARIANT_HOVERCAR) || defined(VARIANT_SKATEBOARD) || defined(ELECTRIC_BRAKE_ENABLE)
+      #if defined(VARIANT_HOVERCAR) || defined(VARIANT_SKATEBOARD) || defined(ELECTRIC_BRAKE_ENABLE) || defined (VARIANT_KCQ_DASH)
         uint16_t speedBlend;                                        // Calculate speed Blend, a number between [0, 1] in fixdt(0,16,15)
         speedBlend = (uint16_t)(((CLAMP(speedAvgAbs,10,60) - 10) << 15) / 50); // speedBlend [0,1] is within [10 rpm, 60rpm]
       #endif
 
       #ifdef STANDSTILL_HOLD_ENABLE
         standstillHold();                                           // Apply Standstill Hold functionality. Only available and makes sense for VOLTAGE or TORQUE Mode
+      #endif
+
+      #ifdef VARIANT_KCQ_DASH
+      if (input1[CONTROL_SERIAL_USART3].cmd > 30)
+      {                              
+        input2[CONTROL_SERIAL_USART3].cmd = 0;//(int16_t)((input2[CONTROL_SERIAL_USART3].cmd * speedBlend) >> 15); // If Brake pedal (input1) is pressed, bring to 0 also the Throttle pedal (input2) to avoid "Double pedal" driving
+        //cruiseControl((uint8_t)rtP_Left.b_cruiseCtrlEna);         // Cruise control deactivated by Brake pedal if it was active
+      }
       #endif
 
       #ifdef VARIANT_HOVERCAR
@@ -277,6 +285,16 @@ int main(void) {
 
       #ifdef VARIANT_HOVERCAR
       if (inIdx == CONTROL_ADC) {                                   // Only use use implementation below if pedals are in use (ADC input)
+        if (speedAvg > 0) {                                         // Make sure the Brake pedal is opposite to the direction of motion AND it goes to 0 as we reach standstill (to avoid Reverse driving by Brake pedal) 
+          input1[inIdx].cmd = (int16_t)((-input1[inIdx].cmd * speedBlend) >> 15);
+        } else {
+          input1[inIdx].cmd = (int16_t)(( input1[inIdx].cmd * speedBlend) >> 15);
+        }
+      }
+      #endif
+
+      #ifdef VARIANT_KCQ_DASH
+      if (inIdx == CONTROL_SERIAL_USART3) {                                   // Only use use implementation below if pedals are in use (ADC input)
         if (speedAvg > 0) {                                         // Make sure the Brake pedal is opposite to the direction of motion AND it goes to 0 as we reach standstill (to avoid Reverse driving by Brake pedal) 
           input1[inIdx].cmd = (int16_t)((-input1[inIdx].cmd * speedBlend) >> 15);
         } else {
@@ -311,6 +329,14 @@ int main(void) {
         } else {
           speed = steer - speed;                // Reverse driving: in this case steer = Brake, speed = Throttle
         }
+        steer = 0;                              // Do not apply steering to avoid side effects if STEER_COEFFICIENT is NOT 0
+      }
+      #endif
+
+      #ifdef VARIANT_KCQ_DASH
+      if (inIdx == CONTROL_SERIAL_USART3)
+      { 
+        speed = steer + speed;                // Forward driving: in this case steer = Brake, speed = Throttle
         steer = 0;                              // Do not apply steering to avoid side effects if STEER_COEFFICIENT is NOT 0
       }
       #endif

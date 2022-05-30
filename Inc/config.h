@@ -375,6 +375,9 @@
   //#define SPEED_MEAS_RIGHT // measure speed on the left wheel. do not use both left and right wheel measure.
   #define SPEED_MEAS_CIRCUMFERENCE 660//circumference of selected wheel for speed calculation(in mm) 
 
+
+  #define SPEED_COEFFICIENT       16384    //  1.0f
+  #define STEER_COEFFICIENT       16384   //   1.0f
   // #define TANK_STEERING              // use for tank steering, each input controls each wheel 
   // #define SUPPORT_BUTTONS_LEFT       // use left sensor board cable for button inputs.  Disable DEBUG_SERIAL_USART2!
   // #define SUPPORT_BUTTONS_RIGHT      // use right sensor board cable for button inputs. Disable DEBUG_SERIAL_USART3!
