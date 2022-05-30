@@ -546,7 +546,7 @@ int main(void) {
           }  
           Feedback.faults = 0x00; //fault flags
           Feedback.flags1 = 0x20; // seems like dash ignore this byte
-          Feedback.flags2 = 0x0b; // seems like dash ignore this byte
+          Feedback.flags2 = ((kcq_rx_flags & 0x7f) << 1) | (((kcq_rx_flags[0] & FLAGS1_MODE_SD) == 0) || ((kcq_rx_flags[1] & FLAGS2_MODE_S) != 0));
           Feedback.time_lsb = 0x00; //lsb of riding time seconds
           Feedback.time_msb = 0x00; //msb of riding time seconds
           Feedback.checksum   = (uint16_t)(Feedback.speed_lsb ^ Feedback.speed_msb ^ Feedback.mileage_lsb ^ Feedback.mileage_msb 
