@@ -56,7 +56,7 @@
     #define FLAGS1_POWEROFF 0x80 //sets after holding the button for ~2 seconds(power off cmd). also sets if power off cmd sent via bluetooth
 
     #define FLAGS2_BRAKE 0x01 //=1 if brake active(brakelight?)
-    #define FLAGS2_MODE_S //=0 in "eco" and "d" mode, =1 in "s" mode
+    #define FLAGS2_MODE_S 0x04//=0 in "eco" and "d" mode, =1 in "s" mode
   #else
     typedef struct{
       uint16_t  start;
