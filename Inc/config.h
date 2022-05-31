@@ -374,7 +374,7 @@
   #define SPEED_MEAS_LEFT // measure speed on the left wheel
   //#define SPEED_MEAS_RIGHT // measure speed on the left wheel. do not use both left and right wheel measure.
   #define SPEED_MEAS_CIRCUMFERENCE 660//circumference of selected wheel for speed calculation(in mm) 
-  #define SPEED_MEAS_POLE_PAIRS //number of pole pairs used for mileage calculation
+  #define SPEED_MEAS_POLE_PAIRS 15 //number of pole pairs used for mileage calculation
 
   #define SPEED_COEFFICIENT       16384    //  1.0f
   #define STEER_COEFFICIENT       16384   //   1.0f
