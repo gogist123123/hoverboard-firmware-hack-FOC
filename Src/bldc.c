@@ -182,11 +182,11 @@ void DMA1_Channel1_IRQHandler(void) {
     #endif
 
     #ifdef SPEED_MEAS_LEFT
-    if(hall_ul > hall_ul_prev)
+    if(hall_ul > hall_prev)
     {
       hall_counter++;
     }
-    hall_ul_prev = hall_ul;
+    hall_prev = hall_ul;
     #endif
 
     /* Set motor inputs here */
