@@ -58,7 +58,7 @@ volatile int pwmr = 0;
 
 extern volatile adc_buf_t adc_buffer;
 
-static uint32_t hall_counter = 0; //electic revolutions counter for mileage calculation
+uint32_t hall_counter = 0; //electic revolutions counter for mileage calculation
 
 uint8_t buzzerFreq          = 0;
 uint8_t buzzerPattern       = 0;
