@@ -65,7 +65,7 @@ extern ExtU rtU_Left;                   /* External inputs */
 extern ExtU rtU_Right;                  /* External inputs */
 //---------------
 
-extern static uint32_t hall_counter;//electic revolutions counter for mileage calculation
+extern uint32_t hall_counter;//electic revolutions counter for mileage calculation
 
 extern uint8_t     inIdx;               // input index used for dual-inputs
 extern uint8_t     inIdx_prev;
