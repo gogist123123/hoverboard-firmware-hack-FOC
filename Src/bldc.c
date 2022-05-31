@@ -58,6 +58,8 @@ volatile int pwmr = 0;
 
 extern volatile adc_buf_t adc_buffer;
 
+static uint32_t hall_counter = 0; //electic revolutions counter for mileage calculation
+
 uint8_t buzzerFreq          = 0;
 uint8_t buzzerPattern       = 0;
 uint8_t buzzerCount         = 0;
@@ -174,6 +176,13 @@ void DMA1_Channel1_IRQHandler(void) {
     uint8_t hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
     uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
     uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
+
+    static uint8_t hall_ul_prev;
+    if(hall_ul > hall_ul_prev)
+    {
+      hall_counter++;
+    }
+    hall_ul_prev = hall_ul;
 
     /* Set motor inputs here */
     rtU_Left.b_motEna     = enableFin;

@@ -65,6 +65,8 @@ extern ExtU rtU_Left;                   /* External inputs */
 extern ExtU rtU_Right;                  /* External inputs */
 //---------------
 
+extern static uint32_t hall_counter;//electic revolutions counter for mileage calculation
+
 extern uint8_t     inIdx;               // input index used for dual-inputs
 extern uint8_t     inIdx_prev;
 extern InputStruct input1[];            // input structure
@@ -525,13 +527,17 @@ int main(void) {
           #else
             speed100m = 0; 
           #endif
+          
           int16_t charge_percent ;
           charge_percent = (int16_t)(((batVoltageCalib - (BAT_EMPTY_CELL * BAT_CELLS))*100) / ((BAT_FULL_CELL * BAT_CELLS) - (BAT_EMPTY_CELL * BAT_CELLS)));   
+          
+          uint16_t mileage100m = (uint16_t)((hall_counter * SPEED_MEAS_CIRCUMFERENCE) /(SPEED_MEAS_POLE_PAIRS * 100000));
+
           Feedback.start = 0x5a; //always 5a, header
           Feedback.speed_lsb = speed100m & 0x00ff; // lsb of (speed in km/h *10)
           Feedback.speed_msb = (speed100m & 0xff00) >> 8; // msb of (speed in km/h *10)
-          Feedback.mileage_lsb = 0x00; // lsb of (mielage/100m)
-          Feedback.mileage_msb = 0x00; // msb of (mielage/100m)
+          Feedback.mileage_lsb = mileage100m & 0xff; // lsb of (mielage/100m)
+          Feedback.mileage_msb = (mileage100m & 0xff00) >> 8; // msb of (mielage/100m)
           if(charge_percent < 0)//charge in %
           {
             Feedback.charge = 0;
