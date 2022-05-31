@@ -371,8 +371,8 @@
   // #define DEBUG_SERIAL_USART3          // right sensor board cable, disable if I2C (nunchuk or lcd) is used!
    //#define DEBUG_SERIAL_PROTOCOL        // uncomment this to send user commands to the board, change parameters and print specific signals (see comms.c for the user commands)
 
-  #define SPEED_MEAS_LEFT // measure speed on the left wheel
-  //#define SPEED_MEAS_RIGHT // measure speed on the left wheel. do not use both left and right wheel measure.
+  #define SPEED_MEAS_LEFT // measure speed and mileage on the left wheel
+  //#define SPEED_MEAS_RIGHT // measure speed and mileage on the left wheel. do not use both left and right wheel measure.
   #define SPEED_MEAS_CIRCUMFERENCE 660//circumference of selected wheel for speed calculation(in mm) 
   #define SPEED_MEAS_POLE_PAIRS 15 //number of pole pairs used for mileage calculation
 

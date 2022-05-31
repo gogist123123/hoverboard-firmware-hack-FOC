@@ -177,12 +177,17 @@ void DMA1_Channel1_IRQHandler(void) {
     uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
     uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
 
-    static uint8_t hall_ul_prev;
+    #if (defined SPEED_MEAS_LEFT) || (defined SPEED_MEAS_RIGHT) 
+    static uint8_t hall_prev;
+    #endif
+
+    #ifdef SPEED_MEAS_LEFT
     if(hall_ul > hall_ul_prev)
     {
       hall_counter++;
     }
     hall_ul_prev = hall_ul;
+    #endif
 
     /* Set motor inputs here */
     rtU_Left.b_motEna     = enableFin;
@@ -221,6 +226,14 @@ void DMA1_Channel1_IRQHandler(void) {
     uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
     uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
     uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
+
+    #ifdef SPEED_MEAS_LEFT
+    if(hall_ur > hall_prev)
+    {
+      hall_counter++;
+    }
+    hall_prev = hall_ul;
+    #endif
 
     /* Set motor inputs here */
     rtU_Right.b_motEna      = enableFin;
