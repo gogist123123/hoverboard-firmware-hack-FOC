@@ -137,6 +137,15 @@ int16_t cmdR;                    // global variable for Right Command
     uint8_t  checksum; //CheckSum8 Xor of [byte1] to [byte10]
     uint8_t  footer; //always b5, footer
   } SerialFeedback;
+  #define KCQ_FAULT_F1 (0x01<<1) //hall sensor
+  #define KCQ_FAULT_F2 (0x01<<2)//mosfet?
+  #define KCQ_FAULT_F3 (0x01<<3)//brake handle
+  #define KCQ_FAULT_F4 (0x01<<4)//"turn"(throttle handle)
+  #define KCQ_FAULT_F5 (0x01<<5)//undervoltage?
+  #define KCQ_FAULT_F6 (0x01<<6)//communication fault
+  #define KCQ_FAULT_F7 (0x01<<7)//overvoltage?
+  #define KCQ_FAULT_F8 (0x01<<8)//opamp/adc?
+  #define KCQ_FAULT_F9 (0x01<<9)//speed lost?? what it means?????
 #else
   typedef struct{
     uint16_t  start;
