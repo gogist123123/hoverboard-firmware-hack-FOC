@@ -65,14 +65,18 @@ extern ExtU rtU_Left;                   /* External inputs */
 extern ExtU rtU_Right;                  /* External inputs */
 //---------------
 
-extern uint32_t hall_counter;//electic revolutions counter for mileage calculation
+
 
 extern uint8_t     inIdx;               // input index used for dual-inputs
 extern uint8_t     inIdx_prev;
 extern InputStruct input1[];            // input structure
 extern InputStruct input2[];            // input structure
 
+
+#ifdef CONTROL_SERIAL_KCQ
+extern uint32_t hall_counter;//electic revolutions counter for mileage calculation
 extern uint8_t kcq_rx_flags[];
+#endif
 
 extern int16_t speedAvg;                // Average measured speed
 extern int16_t speedAvgAbs;             // Average measured speed in absolute
@@ -116,6 +120,10 @@ int16_t right_dc_curr;           // global variable for Right DC Link current
 int16_t dc_curr;                 // global variable for Total DC Link current 
 int16_t cmdL;                    // global variable for Left Command 
 int16_t cmdR;                    // global variable for Right Command 
+
+#ifdef CONTROL_SERIAL_KCQ
+uint16_t kcq_fault = 0x0000;
+#endif
 
 //------------------------------------------------------------------------
 // Local variables
@@ -559,8 +567,8 @@ int main(void) {
           {
             Feedback.charge = (uint8_t)charge_percent;
           }  
-          Feedback.faults = 0x00; //fault flags
-          Feedback.flags1 = 0x20; // seems like dash ignore this byte
+          Feedback.faults = kcq_fault & 0xff; //fault flags (E1-E8)
+          Feedback.flags1 = (uint8_t)(0x20 & ((kcq_fault & 0x100) >> 8)); // seems like dash ignore this byte, bit 0 is E9 fault
           Feedback.flags2 = ((kcq_rx_flags[0] & 0x7f) << 1) | (((kcq_rx_flags[0] & FLAGS1_MODE_SD) == 0) || ((kcq_rx_flags[1] & FLAGS2_MODE_S) != 0));
           Feedback.time_lsb = 0x00; //lsb of riding time seconds
           Feedback.time_msb = 0x00; //msb of riding time seconds
@@ -617,15 +625,27 @@ int main(void) {
     } else if ( BAT_DEAD_ENABLE && batVoltage < BAT_DEAD && speedAvgAbs < 20){
       #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
         printf("Powering off, battery voltage is too low\r\n");
+        #ifdef CONTROL_SERIAL_KCQ
+          kcq_fault = KCQ_FAULT_F5;
+        #endif
       #endif
       poweroff();
     } else if (rtY_Left.z_errCode || rtY_Right.z_errCode) {                                           // 1 beep (low pitch): Motor error, disable motors
       enable = 0;
       beepCount(1, 24, 1);
+      #ifdef CONTROL_SERIAL_KCQ
+          kcq_fault = KCQ_FAULT_F1;
+      #endif
     } else if (timeoutFlgADC) {                                                                       // 2 beeps (low pitch): ADC timeout
       beepCount(2, 24, 1);
+      #ifdef CONTROL_SERIAL_KCQ
+          kcq_fault = KCQ_FAULT_F8;
+      #endif
     } else if (timeoutFlgSerial) {                                                                    // 3 beeps (low pitch): Serial timeout
       beepCount(3, 24, 1);
+      #ifdef CONTROL_SERIAL_KCQ
+          kcq_fault = KCQ_FAULT_F6;
+      #endif
     } else if (timeoutFlgGen) {                                                                       // 4 beeps (low pitch): General timeout (PPM, PWM, Nunchuk)
       beepCount(4, 24, 1);
     } else if (TEMP_WARNING_ENABLE && board_temp_deg_c >= TEMP_WARNING) {                             // 5 beeps (low pitch): Mainboard temperature warning
@@ -639,6 +659,9 @@ int main(void) {
       backwardDrive = 1;
     } else {  // do not beep
       beepCount(0, 0, 0);
+      #ifdef CONTROL_SERIAL_KCQ
+          kcq_fault = 0;
+      #endif
       backwardDrive = 0;
     }
 
