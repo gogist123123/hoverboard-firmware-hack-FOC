@@ -376,6 +376,9 @@
   #define SPEED_MEAS_CIRCUMFERENCE 660//circumference of selected wheel for speed calculation(in mm) 
   #define SPEED_MEAS_POLE_PAIRS 15 //number of pole pairs used for mileage calculation
 
+  #define KCQ_ECO_DISABLE_LEFT //disable left motor in eco mode (both wheels always active fob brake)
+  #define KCQ_ECO_DISABLE_RIGHT //disable right motor in eco mode (both wheels always active fob brake)
+
   #define SPEED_COEFFICIENT       16384    //  1.0f
   #define STEER_COEFFICIENT       16384   //   1.0f
   // #define TANK_STEERING              // use for tank steering, each input controls each wheel 

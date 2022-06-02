@@ -121,13 +121,21 @@ int16_t dc_curr;                 // global variable for Total DC Link current
 int16_t cmdL;                    // global variable for Left Command 
 int16_t cmdR;                    // global variable for Right Command 
 
-#ifdef CONTROL_SERIAL_KCQ
-uint16_t kcq_fault = 0x0000;
-#endif
+
 
 //------------------------------------------------------------------------
 // Local variables
 //------------------------------------------------------------------------
+
+
+#ifdef CONTROL_SERIAL_KCQ
+uint16_t kcq_fault = 0x0000;
+uint8_t kcq_mode = 0;
+#define KCQ_MODE_ECO 0
+#define KCQ_MODE_D 1
+#define KCQ_MODE_S 2
+#endif
+
 #if defined(FEEDBACK_SERIAL_USART2) || defined(FEEDBACK_SERIAL_USART3)
 #ifdef CONTROL_SERIAL_KCQ
   typedef struct{
@@ -261,6 +269,25 @@ int main(void) {
     readCommand();                        // Read Command: input1[inIdx].cmd, input2[inIdx].cmd
     calcAvgSpeed();                       // Calculate average measured speed: speedAvg, speedAvgAbs
 
+    #ifdef CONTROL_SERIAL_KCQ 
+    if((kcq_rx_flags[0] & FLAGS1_MODE_SD) != 0)
+    {
+      if((kcq_rx_flags[1] & FLAGS2_MODE_S) != 0)
+      {
+        kcq_mode = KCQ_MODE_S;
+      }
+      else
+      {
+        kcq_mode = KCQ_MODE_D;
+      }
+    }
+    else
+    {
+      kcq_mode = KCQ_MODE_ECO;
+    }
+
+    #endif
+
     #ifndef VARIANT_TRANSPOTTER
       // ####### MOTOR ENABLING: Only if the initial input is very small (for SAFETY) #######
       if (enable == 0 && !rtY_Left.z_errCode && !rtY_Right.z_errCode && 
@@ -374,6 +401,20 @@ int main(void) {
       #else 
         // ####### MIXER #######
         mixerFcn(speed << 4, steer << 4, &cmdR, &cmdL);   // This function implements the equations above
+      #endif
+
+      #if (defined VARIANT_KCQ_DASH) && (defined KCQ_ECO_DISABLE_RIGHT)
+        if(cmdR > 0)
+        {
+          cmdR = 0; //do not use right wheel for thrust in ECO mode
+        }
+      #endif
+
+      #if (defined VARIANT_KCQ_DASH) && (defined KCQ_ECO_DISABLE_LEFT)
+        if(cmdL > 0)
+        {
+          cmdL = 0; //do not use left wheel for thrust in ECO mode
+        }
       #endif
 
 
@@ -665,7 +706,7 @@ int main(void) {
       backwardDrive = 0;
     }
 
-    #ifdef KCQ_PCB_LED_BRAKE
+    #ifdef KCQ_PCB_LED_BRAKE //control pcb led as tail/brake light
     if((kcq_rx_flags[1] & FLAGS2_BRAKE) != 0) // if brake light bit is set
     {
       brakelight_counter++;
