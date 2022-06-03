@@ -129,7 +129,7 @@ int16_t cmdR;                    // global variable for Right Command
 
 
 #ifdef CONTROL_SERIAL_KCQ
-uint16_t kcq_fault = 0x0000;
+static uint16_t kcq_fault = 0x0000;
 uint8_t kcq_mode = 0;
 #define KCQ_MODE_ECO 0
 #define KCQ_MODE_D 1
