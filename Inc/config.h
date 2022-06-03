@@ -162,7 +162,7 @@
 #define N_MOT_MAX       1000            // [rpm] Maximum motor speed limit
 
 // Field Weakening / Phase Advance
-#define FIELD_WEAK_ENA  0               // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
+#define FIELD_WEAK_ENA  1               // [-] Field Weakening / Phase Advance enable flag: 0 = Disabled (default), 1 = Enabled
 #define FIELD_WEAK_MAX  5               // [A] Maximum Field Weakening D axis current (only for FOC). Higher current results in higher maximum speed. Up to 10A has been tested using 10" wheels.
 #define PHASE_ADV_MAX   25              // [deg] Maximum Phase Advance angle (only for SIN). Higher angle results in higher maximum speed.
 #define FIELD_WEAK_HI   1000            // (1000, 1500] Input target High threshold for reaching maximum Field Weakening / Phase Advance. Do NOT set this higher than 1500.
@@ -373,10 +373,10 @@
 
   #define SPEED_MEAS_LEFT // measure speed and mileage on the left wheel
   //#define SPEED_MEAS_RIGHT // measure speed and mileage on the left wheel. do not use both left and right wheel measure.
-  #define SPEED_MEAS_CIRCUMFERENCE 660//circumference of selected wheel for speed calculation(in mm) 
+  #define SPEED_MEAS_CIRCUMFERENCE 680//circumference of selected wheel for speed calculation(in mm) 
   #define SPEED_MEAS_POLE_PAIRS 15 //number of pole pairs used for mileage calculation
 
-  #define KCQ_ECO_DISABLE_LEFT //disable left motor in eco mode (both wheels always active fob brake)
+  //#define KCQ_ECO_DISABLE_LEFT //disable left motor in eco mode (both wheels always active fob brake)
   #define KCQ_ECO_DISABLE_RIGHT //disable right motor in eco mode (both wheels always active fob brake)
 
   #define SPEED_COEFFICIENT       16384    //  1.0f
