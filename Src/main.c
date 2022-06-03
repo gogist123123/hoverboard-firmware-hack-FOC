@@ -153,15 +153,15 @@ uint8_t kcq_mode = 0;
     uint8_t  checksum; //CheckSum8 Xor of [byte1] to [byte10]
     uint8_t  footer; //always b5, footer
   } SerialFeedback;
-  #define KCQ_FAULT_F1 (0x01<<1) //hall sensor
-  #define KCQ_FAULT_F2 (0x01<<2)//mosfet?
-  #define KCQ_FAULT_F3 (0x01<<3)//brake handle
-  #define KCQ_FAULT_F4 (0x01<<4)//"turn"(throttle handle)
-  #define KCQ_FAULT_F5 (0x01<<5)//undervoltage?
-  #define KCQ_FAULT_F6 (0x01<<6)//communication fault
-  #define KCQ_FAULT_F7 (0x01<<7)//overvoltage?
-  #define KCQ_FAULT_F8 (0x01<<8)//opamp/adc?
-  #define KCQ_FAULT_F9 (0x01<<9)//speed lost?? what it means?????
+  #define KCQ_FAULT_F1 (0x01<<0) //hall sensor
+  #define KCQ_FAULT_F2 (0x01<<1)//mosfet?
+  #define KCQ_FAULT_F3 (0x01<<2)//brake handle
+  #define KCQ_FAULT_F4 (0x01<<3)//"turn"(throttle handle)
+  #define KCQ_FAULT_F5 (0x01<<4)//undervoltage?
+  #define KCQ_FAULT_F6 (0x01<<5)//communication fault
+  #define KCQ_FAULT_F7 (0x01<<6)//overvoltage
+  #define KCQ_FAULT_F8 (0x01<<7)//opamp/adc?
+  #define KCQ_FAULT_F9 (0x01<<8)//speed lost?? what it means?????
 #else
   typedef struct{
     uint16_t  start;
@@ -291,7 +291,7 @@ int main(void) {
     #ifndef VARIANT_TRANSPOTTER
       // ####### MOTOR ENABLING: Only if the initial input is very small (for SAFETY) #######
       if (enable == 0 && !rtY_Left.z_errCode && !rtY_Right.z_errCode && 
-          ABS(input1[inIdx].cmd) < 50 && ABS(input2[inIdx].cmd) < 50){
+          ABS(input1[inIdx].cmd) < 50 && ABS(input2[inIdx].cmd) < 50 && (kcq_fault == 0)){
         beepShort(6);                     // make 2 beeps indicating the motor enable
         beepShort(4); HAL_Delay(100);
         steerFixdt = speedFixdt = 0;      // reset filters
@@ -404,14 +404,14 @@ int main(void) {
       #endif
 
       #if (defined VARIANT_KCQ_DASH) && (defined KCQ_ECO_DISABLE_RIGHT)
-        if(cmdR > 0)
+        if((cmdR > 0) && (kcq_mode == KCQ_MODE_ECO))
         {
           cmdR = 0; //do not use right wheel for thrust in ECO mode
         }
       #endif
 
       #if (defined VARIANT_KCQ_DASH) && (defined KCQ_ECO_DISABLE_LEFT)
-        if(cmdL > 0)
+        if(cmdL > 0 && (kcq_mode == KCQ_MODE_ECO))
         {
           cmdL = 0; //do not use left wheel for thrust in ECO mode
         }
@@ -666,11 +666,14 @@ int main(void) {
     } else if ( BAT_DEAD_ENABLE && batVoltage < BAT_DEAD && speedAvgAbs < 20){
       #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
         printf("Powering off, battery voltage is too low\r\n");
-        #ifdef CONTROL_SERIAL_KCQ
-          kcq_fault = KCQ_FAULT_F5;
-        #endif
+        
       #endif
+      #ifdef CONTROL_SERIAL_KCQ
+        kcq_fault = KCQ_FAULT_F5;
+        enable = 0;
+      #else
       poweroff();
+      #endif
     } else if (rtY_Left.z_errCode || rtY_Right.z_errCode) {                                           // 1 beep (low pitch): Motor error, disable motors
       enable = 0;
       beepCount(1, 24, 1);
